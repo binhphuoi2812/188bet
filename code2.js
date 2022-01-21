@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 puppeteer.use(require('puppeteer-extra-plugin-angular')());
 const cron = require('node-cron')
-const fs = require('fs')
 
 var i = 0;
 var start = '';
@@ -38,7 +37,7 @@ const Screenshot = async () => {
     
 
     cron.schedule('1 * * * * *', async () => {
-        let cookies = await page.cookies();
+        let cookies = await page2.cookies();
         limitCookies = cookies.map((item) => {
             item.expires = -1;
             return item;
@@ -49,31 +48,12 @@ const Screenshot = async () => {
             start = new Date();
         }
         let now = new Date();
-        console.log(111,now.getTime() / 1000 - start.getTime() / 1000 >= 900);
-        console.log(222,now.getTime() / 1000 ,start.getTime() / 1000);
         if(now.getTime() / 1000 - start.getTime() / 1000 >= 900){
-            await page.close();
-            await page2.close();
-            await browser.close();
-            i = 0;
-            Screenshot();          
-            return false;
-        } else {
+            page2.click('#Balance');
+            await page2.mouse.click(0, 0);
+            await page2.bringToFront();
+        }
         let current = now.toLocaleTimeString().split(' ');
-        
-        const path = './screenshot.png'
-
-        // try {
-        //     if (fs.existsSync(path)) {
-
-        //         fs.unlinkSync(path);
-
-        //     }
-        // } catch(err) {
-
-        // console.error(err)
-
-        // }
         page2.screenshot({
 
             path: `./screenshot${current[0]}.png`,
@@ -81,9 +61,8 @@ const Screenshot = async () => {
             fullPage: true
 
             });
-            i++;
-          }
-        
+
+        i++;
     });
  }
 
